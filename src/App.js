@@ -4,7 +4,7 @@ import { UserDetail } from "./UserDetail";
 function App() {
   return (
     <div className="App">
-      <BrowserRouter  basename={window.location.pathname || ''>
+      <BrowserRouter basename={window.location.pathname || ""}>
         <Routes>
           <Route exact path="/" element={<Landing />}></Route>
           <Route path="/userDetail" element={<UserDetail />}></Route>
