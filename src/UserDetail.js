@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./index.css";
 import { Row, Col, Avatar, Popover, Button } from "antd";
+import { CloseOutlined, SendOutlined } from "@ant-design/icons";
 import { MapContainer } from "react-leaflet/MapContainer";
 import { TileLayer } from "react-leaflet/TileLayer";
 import "../node_modules/leaflet/dist/leaflet.css"; // sass
@@ -12,6 +13,9 @@ export const UserDetail = (props) => {
   const [selectedTab, setSelectedTab] = useState("profile");
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
   const [userList, setUserList] = useState([]);
+  const [chatUser, setChatUser] = useState(null);
+  const [chatBoxEnable, setChatBoxEnable] = useState(false);
+  const [messagingEnabled, setMessagingEnabled] = useState(false);
   const navigate = useNavigate();
 
   const onTabSelect = (val) => {
@@ -703,28 +707,166 @@ export const UserDetail = (props) => {
         </div>
       </div>
       <Row justify={"end"}>
+        {chatUser && (
+          <div
+            style={{
+              width: "250px",
+              marginRight: "410px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "space-between",
+              borderRadius: " 10px 10px 0 0",
+              position: "fixed",
+              bottom: "0",
+              zIndex: 1000,
+            }}
+          >
+            <div
+              style={{
+                width: "252px",
+                height: "35px",
+                backgroundColor: "#4054c8",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                borderRadius: " 10px 10px 0 0",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                setMessagingEnabled((pre) => !pre);
+              }}
+            >
+              <span style={{ marginLeft: "10px", color: "white" }}>
+                <Avatar
+                  src={chatUser["profilepicture"]}
+                  size={"small"}
+                  style={{ marginRight: "10px" }}
+                />
+                {chatUser["name"]}
+              </span>
+
+              <span style={{ color: "white" }}>
+                {messagingEnabled ? (
+                  <i class="fas fa-angle-down" style={{ color: "white" }}></i>
+                ) : (
+                  <i class="fas fa-angle-up" style={{ color: "white" }}></i>
+                )}
+              </span>
+              <span style={{ marginRight: "10px", color: "white" }}>
+                <CloseOutlined
+                  onClick={() => {
+                    setChatUser(null);
+                    setMessagingEnabled(false);
+                  }}
+                />
+              </span>
+            </div>
+            <div
+              style={{
+                display: messagingEnabled ? null : "none",
+                height: "250px",
+                background: "white",
+                border: "1px solid #4054c8",
+                width: "250px",
+                overflowY: "auto",
+              }}
+              id="narrow-scrollbar"
+            >
+              <div style={{ position: "absolute", bottom: 5, right: 5 }}>
+                <SendOutlined rotate={315} style={{ color: "#4054c8" }} />
+              </div>
+            </div>
+          </div>
+        )}
+
         <div
           style={{
-            width: "200px",
-            height: "30px",
-            marginRight: "75px",
-            backgroundColor: "#4054c8",
+            width: "250px",
+            marginRight: "150px",
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
             justifyContent: "space-between",
             borderRadius: " 10px 10px 0 0",
+            position: "fixed",
+            bottom: "0px",
+            zIndex: 1000,
           }}
         >
-          <span style={{ marginLeft: "10px", color: "white" }}>
-            <i
-              class="far fa-comment-alt"
-              style={{ color: "white", marginRight: "10px" }}
-            ></i>
-            Chats
-          </span>
-          <span style={{ marginRight: "10px", color: "white" }}>
-            <i class="fas fa-angle-up" style={{ color: "white" }}></i>
-          </span>
+          <div
+            style={{
+              width: "252px",
+              height: "35px",
+              backgroundColor: "#4054c8",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              borderRadius: " 10px 10px 0 0",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              setChatBoxEnable((pre) => !pre);
+            }}
+          >
+            <span style={{ marginLeft: "10px", color: "white" }}>
+              <i
+                class="far fa-comment-alt"
+                style={{ color: "white", marginRight: "10px" }}
+              ></i>
+              Chats
+            </span>
+            <span style={{ marginRight: "10px", color: "white" }}>
+              {chatBoxEnable ? (
+                <i class="fas fa-angle-down" style={{ color: "white" }}></i>
+              ) : (
+                <i class="fas fa-angle-up" style={{ color: "white" }}></i>
+              )}
+            </span>
+          </div>
+          <div
+            style={{
+              display: chatBoxEnable ? null : "none",
+              height: "250px",
+              background: "white",
+              border: "1px solid #4054c8",
+              width: "250px",
+              overflowY: "auto",
+            }}
+            id="narrow-scrollbar"
+          >
+            {userList.length > 0 &&
+              userList.map((val, idx) => {
+                return (
+                  <>
+                    {val.id !== user.id && (
+                      <Row
+                        style={{ margin: "10px" }}
+                        onClick={() => {
+                          setChatUser(val);
+                          setMessagingEnabled(true);
+                        }}
+                      >
+                        <Avatar src={val.profilepicture} size={"small"} />
+                        <span style={{ marginLeft: "10px" }}>{val.name}</span>
+                        <div style={{ flexGrow: 1 }}>
+                          <span
+                            style={{
+                              float: "right",
+                              width: "10px",
+                              height: "10px",
+                              borderRadius: "50%",
+                              backgroundColor:
+                                idx % 2 === 0 ? "green" : "#d1d1d1",
+                            }}
+                          ></span>
+                        </div>
+                      </Row>
+                    )}
+                  </>
+                );
+              })}
+          </div>
         </div>
       </Row>
     </div>
